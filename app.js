@@ -109,6 +109,10 @@ function createHomeScreen() {
     const btnEstoque = document.createElement("button");
     btnEstoque.textContent = "ESTOQUE";
     btnEstoque.classList.add("navBtn");
+
+    // Adicione os event listeners aqui, dentro da função
+    btnNovo.addEventListener("click", () => renderScreen("novoLivro"));
+    btnEstoque.addEventListener("click", () => renderScreen("estoque"));
   
     nav.appendChild(btnNovo);
     nav.appendChild(btnEstoque);
@@ -203,7 +207,189 @@ function createHomeScreen() {
     container.appendChild(main);
   
     return container;
-  }
+}
+
+// Add these new functions after createHomeScreen()
+
+function createNovoLivroScreen() {
+    const container = document.createElement("div");
+    container.classList.add("homeContainer");
+  
+    // Header (reusing the same header from home)
+    const header = document.createElement("header");
+    header.classList.add("headerWhite");
+  
+    const logoGroup = document.createElement("div");
+    logoGroup.classList.add("logoGroup");
+  
+    const logoImg = document.createElement("img");
+    logoImg.src = "./img/lion-book 1.png";
+    logoImg.alt = "LionBook Logo";
+  
+    const logoText = document.createElement("h1");
+    logoText.textContent = "LionBook";
+    logoText.classList.add("logoTitle");
+  
+    logoGroup.appendChild(logoImg);
+    logoGroup.appendChild(logoText);
+    header.appendChild(logoGroup);
+  
+    // Main content
+    const main = document.createElement("main");
+    main.classList.add("mainSection");
+  
+    const formContainer = document.createElement("div");
+    formContainer.classList.add("formContainer");
+  
+    const form = document.createElement("form");
+    form.classList.add("bookForm");
+  
+    // Input fields
+    const fields = [
+      { label: "ID", type: "number", name: "id" },
+      { label: "Título", type: "text", name: "titulo" },
+      { label: "Autor", type: "text", name: "autor" },
+      { label: "Quantidade", type: "number", name: "quantidade" }
+    ];
+  
+    fields.forEach(field => {
+      const inputGroup = document.createElement("div");
+      inputGroup.classList.add("inputGroup");
+  
+      const label = document.createElement("label");
+      label.textContent = field.label;
+      label.htmlFor = field.name;
+  
+      const input = document.createElement("input");
+      input.type = field.type;
+      input.id = field.name;
+      input.name = field.name;
+      input.classList.add("formInput");
+  
+      inputGroup.appendChild(label);
+      inputGroup.appendChild(input);
+      form.appendChild(inputGroup);
+    });
+  
+    // Buttons
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("buttonGroup");
+  
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = "SALVAR";
+    saveBtn.classList.add("primaryBtn");
+    saveBtn.type = "button";
+    saveBtn.addEventListener("click", () => {
+      alert("Salvando livro...");
+      // Aqui você implementará a lógica de salvamento com a API
+    });
+  
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "CANCELAR";
+    cancelBtn.classList.add("secondaryBtn");
+    cancelBtn.type = "button";
+    cancelBtn.addEventListener("click", () => {
+      renderScreen("home");
+    });
+  
+    buttonGroup.appendChild(saveBtn);
+    buttonGroup.appendChild(cancelBtn);
+    form.appendChild(buttonGroup);
+  
+    formContainer.appendChild(form);
+    main.appendChild(formContainer);
+    container.appendChild(header);
+    container.appendChild(main);
+  
+    return container;
+}
+  
+  
+function createNovoLivroScreen() {
+    const container = document.createElement("div");
+    container.classList.add("homeContainer");
+  
+    // Header (reusing the same header from home)
+    const header = document.createElement("header");
+    header.classList.add("headerWhite");
+  
+    const logoGroup = document.createElement("div");
+    logoGroup.classList.add("logoGroup");
+  
+    const logoImg = document.createElement("img");
+    logoImg.src = "./img/lion-book 1.png";
+    logoImg.alt = "LionBook Logo";
+  
+    const logoText = document.createElement("h1");
+    logoText.textContent = "LionBook - CADASTRO";
+    logoText.classList.add("logoTitle");
+  
+    logoGroup.appendChild(logoImg);
+    logoGroup.appendChild(logoText);
+    header.appendChild(logoGroup);
+  
+    // Main content
+    const main = document.createElement("main");
+    main.classList.add("mainSection", "cadastroSection");
+  
+    const form = document.createElement("form");
+    form.classList.add("cadastroForm");
+  
+    // Input fields
+    const fields = [
+      { label: "TÍTULO", type: "text", name: "titulo" },
+      { label: "QUANTIDADE", type: "number", name: "quantidade" },
+      { label: "ISBN", type: "text", name: "isbn" },
+      { label: "DATA DE PUBLICAÇÃO", type: "date", name: "dataPublicacao" }
+    ];
+  
+    fields.forEach(field => {
+      const input = document.createElement("input");
+      input.type = field.type;
+      input.placeholder = field.label;
+      input.name = field.name;
+      input.classList.add("cadastroInput");
+      form.appendChild(input);
+    });
+  
+    // Buttons
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("cadastroBtnGroup");
+  
+    const cadastrarBtn = document.createElement("button");
+    cadastrarBtn.textContent = "CADASTRAR";
+    cadastrarBtn.classList.add("cadastroBtn");
+    cadastrarBtn.type = "button";
+    
+    const cancelarBtn = document.createElement("button");
+    cancelarBtn.textContent = "CANCELAR";
+    cancelarBtn.classList.add("cadastroBtn", "btnCancelar");
+    cancelarBtn.type = "button";
+    
+    // Event listeners
+    cadastrarBtn.addEventListener("click", () => {
+      alert("Cadastrando livro...");
+      // Implementar lógica de cadastro com API
+    });
+    
+    cancelarBtn.addEventListener("click", () => {
+      renderScreen("home");
+    });
+  
+    buttonGroup.appendChild(cadastrarBtn);
+    buttonGroup.appendChild(cancelarBtn);
+    form.appendChild(buttonGroup);
+  
+    main.appendChild(form);
+    container.appendChild(header);
+    container.appendChild(main);
+  
+    return container;
+}
+  
+
+
+  
   
 
 // =============================
@@ -216,6 +402,10 @@ function renderScreen(screenName) {
     root.appendChild(createLoginScreen());
   } else if (screenName === "home") {
     root.appendChild(createHomeScreen());
+  } else if (screenName === "novoLivro"){
+    root.appendChild(createNovoLivroScreen());
+  } else if (screenName === "estoque") {
+    root.appendChild(createEstoqueScreen());
   }
 }
 
