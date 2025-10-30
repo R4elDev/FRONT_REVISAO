@@ -386,15 +386,177 @@ function createNovoLivroScreen() {
   
     return container;
 }
+
+function createEstoqueScreen() {
+    const container = document.createElement("div");
+    container.classList.add("homeContainer");
   
+    // Header
+    const header = document.createElement("header");
+    header.classList.add("headerWhite");
+  
+    const logoGroup = document.createElement("div");
+    logoGroup.classList.add("logoGroup");
+  
+    const logoImg = document.createElement("img");
+    logoImg.src = "./img/lion-book 1.png";
+    logoImg.alt = "LionBook Logo";
+  
+    const logoText = document.createElement("h1");
+    logoText.textContent = "LionBook - ESTOQUE";
+    logoText.classList.add("logoTitle");
+  
+    logoGroup.appendChild(logoImg);
+    logoGroup.appendChild(logoText);
+    header.appendChild(logoGroup);
+  
+    // Main content
+    const main = document.createElement("main");
+    main.classList.add("mainSection", "cadastroSection");
+  
+    const form = document.createElement("form");
+    form.classList.add("cadastroForm");
+  
+    // Dropdown TÍTULO
+    const selectTitulo = document.createElement("select");
+    selectTitulo.name = "titulo";
+    selectTitulo.classList.add("cadastroInput", "selectInput");
+    const optionTitulo = document.createElement("option");
+    optionTitulo.value = "";
+    optionTitulo.textContent = "TÍTULO";
+    optionTitulo.disabled = true;
+    optionTitulo.selected = true;
+    selectTitulo.appendChild(optionTitulo);
+    form.appendChild(selectTitulo);
+    
+    // Carrega livros no dropdown
+    const loadLivrosDropdown = async () => {
+      try {
+        const result = await getLivrosEstoque();
+        
+        if (result.status === 200 && result.livros) {
+          result.livros.forEach(livro => {
+            const option = document.createElement("option");
+            option.value = livro.id;
+            option.textContent = livro.titulo;
+            selectTitulo.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao carregar livros:', error);
+      }
+    };
+    
+    loadLivrosDropdown();
+  
+    // Dropdown TIPO DE MOVIMENTO
+    const selectTipo = document.createElement("select");
+    selectTipo.name = "tipoMovimento";
+    selectTipo.classList.add("cadastroInput", "selectInput");
+    const optionTipo = document.createElement("option");
+    optionTipo.value = "";
+    optionTipo.textContent = "TIPO DE MOVIMENTO";
+    optionTipo.disabled = true;
+    optionTipo.selected = true;
+    selectTipo.appendChild(optionTipo);
+    
+    // Adiciona opções de movimento
+    const tiposMovimento = [
+      { value: "entrada", text: "ENTRADA" },
+      { value: "saida", text: "SAÍDA" }
+    ];
+    
+    tiposMovimento.forEach(tipo => {
+      const option = document.createElement("option");
+      option.value = tipo.value;
+      option.textContent = tipo.text;
+      selectTipo.appendChild(option);
+    });
+    
+    form.appendChild(selectTipo);
+  
+    // Input QUANTIDADE
+    const inputQuantidade = document.createElement("input");
+    inputQuantidade.type = "number";
+    inputQuantidade.placeholder = "QUANTIDADE";
+    inputQuantidade.name = "quantidade";
+    inputQuantidade.classList.add("cadastroInput");
+    form.appendChild(inputQuantidade);
+  
+    // Buttons
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("cadastroBtnGroup");
+  
+    const salvarBtn = document.createElement("button");
+    salvarBtn.textContent = "SALVAR";
+    salvarBtn.classList.add("cadastroBtn");
+    salvarBtn.type = "button";
+    
+    const cancelarBtn = document.createElement("button");
+    cancelarBtn.textContent = "CANCELAR";
+    cancelarBtn.classList.add("cadastroBtn", "btnCancelar");
+    cancelarBtn.type = "button";
+    
+    // Event listeners
+    salvarBtn.addEventListener("click", async () => {
+      const livroId = selectTitulo.value;
+      const tipoMovimento = selectTipo.value;
+      const quantidade = inputQuantidade.value;
+      
+      // Validação de campos obrigatórios
+      if (!validateRequired({ 
+        'Título': livroId, 
+        'Tipo de Movimento': tipoMovimento, 
+        'Quantidade': quantidade 
+      })) {
+        return;
+      }
+      
+      // Desabilita o botão durante o salvamento
+      salvarBtn.disabled = true;
+      salvarBtn.textContent = "SALVANDO...";
+      
+      try {
+        // Para simplificar, vamos assumir que a API de estoque recebe a quantidade final
+        // Em uma implementação real, você pode precisar buscar a quantidade atual primeiro
+        const quantidadeNum = parseInt(quantidade);
+        
+        const result = await updateEstoque(livroId, quantidadeNum);
+        
+        if (result.status === 200) {
+          showMessage(`Estoque atualizado com sucesso!`);
+          // Limpa o formulário
+          selectTitulo.selectedIndex = 0;
+          selectTipo.selectedIndex = 0;
+          inputQuantidade.value = '';
+        } else {
+          showMessage(result.message || "Erro ao atualizar estoque", true);
+        }
+      } catch (error) {
+        showMessage("Erro de conexão ao atualizar estoque", true);
+      } finally {
+        // Reabilita o botão
+        salvarBtn.disabled = false;
+        salvarBtn.textContent = "SALVAR";
+      }
+    });
+    
+    cancelarBtn.addEventListener("click", () => {
+      renderScreen("home");
+    });
+  
+    buttonGroup.appendChild(salvarBtn);
+    buttonGroup.appendChild(cancelarBtn);
+    form.appendChild(buttonGroup);
+  
+    main.appendChild(form);
+    container.appendChild(header);
+    container.appendChild(main);
+  
+    return container;
+}
 
 
-  
-  
-
-// =============================
-// ⚡ FUNÇÃO CONTROLADORA DE TELA
-// =============================
 function renderScreen(screenName) {
   root.innerHTML = ""; // limpa a tela
 

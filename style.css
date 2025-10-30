@@ -8,14 +8,27 @@ body {
     width: 100vw;
     height: 100vh;
     margin: 0;
+    padding: 0;
     background-image: url('./img/BG.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    font-family: 'Inter', sans-serif;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Inter', sans-serif;
+}
+
+/* Quando há homeContainer, remove a centralização do root */
+#root:has(.homeContainer) {
+    display: block;
+    align-items: unset;
+    justify-content: unset;
 }
 
 .containerPrincipal {
@@ -39,7 +52,6 @@ body {
     height: 32%;
     width: 100%;
 }
-
 
 .inputContainer {
     display: flex;
@@ -67,7 +79,6 @@ body {
     color: white;
     font-size: 14px;
 }
-
 
 .inputss::placeholder {
     font-size: 14px;
@@ -117,54 +128,56 @@ body {
     align-items: center;
     padding: 15px 40px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .logoGroup {
+}
+
+.logoGroup {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
-  }
-  
-  .logoGroup img {
+}
+
+.logoGroup img {
     width: 225px;
     height: 150px;
-  }
-  
-  .logoTitle {
+}
+
+.logoTitle {
     font-size: 96px;
     font-weight: 700;
     letter-spacing: 1px;
-  }
-  
-  /* ===== CONTEÚDO PRINCIPAL ===== */
-  .homeContainer {
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+.homeContainer {
     width: 100%;
+    height: 100%;
     min-height: 100vh;
     background: #2148C0;
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  .mainSection {
+    position: relative;
+}
+
+.mainSection {
     width: 100%;
     max-width: 900px;
     margin-top: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  .navButtons {
+}
+
+.navButtons {
     width: 100%;
     display: flex;
     gap: 10px;
     margin-bottom: 30px;
-  }
-  
-  .navBtn {
+}
+
+.navBtn {
     background: white;
     color: #2148C0;
     font-weight: 600;
@@ -173,42 +186,42 @@ body {
     border-radius: 6px;
     cursor: pointer;
     transition: 0.2s;
-  }
-  
-  .navBtn:hover {
+}
+
+.navBtn:hover {
     background: #e5e5e5;
-  }
-  
-  /* ===== TABELA ===== */
-  .tableContainer {
+}
+
+/* ===== TABELA ===== */
+.tableContainer {
     width: 100%;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     padding: 20px;
-  }
-  
-  .table {
+}
+
+.table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
     color: white;
-  }
-  
-  .table th, .table td {
+}
+
+.table th, .table td {
     border: 1px solid white;
     padding: 12px;
-  }
-  
-  .table th {
+}
+
+.table th {
     background: rgba(255,255,255,0.2);
     font-weight: 600;
-  }
-  
-  .acoes {
+}
+
+.acoes {
     text-align: center;
-  }
-  
-  .btnIcon {
+}
+
+.btnIcon {
     border: none;
     background: transparent;
     cursor: pointer;
@@ -216,63 +229,63 @@ body {
     margin: 0 5px;
     color: white;
     transition: 0.2s;
-  }
-  
-  .btnIcon:hover {
-    transform: scale(1.2);
-  }
+}
 
-  .formContainer {
+.btnIcon:hover {
+    transform: scale(1.2);
+}
+
+.formContainer {
     width: 100%;
     max-width: 600px;
     margin: 2rem auto;
     padding: 2rem;
-  }
-  
-  .bookForm {
+}
+
+.bookForm {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-  
-  .inputGroup {
+}
+
+.inputGroup {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-  
-  .formInput {
+}
+
+.formInput {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-  }
-  
-  .buttonGroup {
+}
+
+.buttonGroup {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
     margin-top: 2rem;
-  }
-  
-  .primaryBtn {
+}
+
+.primaryBtn {
     background-color: #007bff;
     color: white;
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-  
-  .secondaryBtn {
+}
+
+.secondaryBtn {
     background-color: #6c757d;
     color: white;
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-  
-  .backBtn {
+}
+
+.backBtn {
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;
     background-color: #6c757d;
@@ -280,6 +293,109 @@ body {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-  
-  
+}
+
+/* ===== TELAS DE CADASTRO E ESTOQUE ===== */
+.cadastroSection {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cadastroForm {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.cadastroInput {
+    width: 100%;
+    height: 50px;
+    background: transparent !important;
+    border: 2px solid white !important;
+    border-radius: 4px;
+    color: white !important;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0 15px;
+    letter-spacing: 0.5px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.cadastroInput::placeholder {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.cadastroInput:focus {
+    border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Remove autofill styles */
+.cadastroInput:-webkit-autofill,
+.cadastroInput:-webkit-autofill:hover,
+.cadastroInput:-webkit-autofill:focus {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0px 1000px #2148C0 inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Estilização para selects (dropdowns) */
+.selectInput {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+.selectInput option {
+    background-color: #2148C0;
+    color: white;
+}
+
+/* Grupo de botões */
+.cadastroBtnGroup {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.cadastroBtn {
+    background: white;
+    color: #2148C0;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 40px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.cadastroBtn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cadastroBtn:active {
+    transform: translateY(0);
+}
