@@ -1,0 +1,224 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-image: url('./img/BG.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.containerPrincipal {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 300px;
+    height: 398px;
+    padding: 15px;
+}
+
+.containerImg {
+    height: 33%;
+}
+
+.containerInputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 32%;
+    width: 100%;
+}
+
+
+.inputContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+    border: 1px solid white;
+    border-radius: 4px;
+    background: transparent;
+    height: 45px;
+    padding: 0 10px;
+}
+
+.iconInput {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    filter: brightness(0) invert(1); 
+}
+
+.inputss {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: white;
+    font-size: 14px;
+}
+
+
+.inputss::placeholder {
+    font-size: 14px;
+    font-weight: 100;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.containerButton {
+    width: 100%;
+}
+
+.loginButton {
+    background-color: white;
+    width: 100%;
+    height: 45px;
+    border: none;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    font-weight: 600;
+    color: #2148C0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#loginButton:hover {
+    background-color: #2148C0;
+    color: white;
+}
+
+.forgotPassword {
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    font-size: 12px;
+}
+
+/* ===== HEADER BRANCO ===== */
+.headerWhite {
+    width: 100vw;
+    background: white;
+    color: #2148C0;
+    display: flex;
+    align-items: center;
+    padding: 15px 40px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .logoGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .logoGroup img {
+    width: 225px;
+    height: 150px;
+  }
+  
+  .logoTitle {
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  
+  /* ===== CONTEÚDO PRINCIPAL ===== */
+  .homeContainer {
+    width: 100%;
+    min-height: 100vh;
+    background: #2148C0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .mainSection {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .navButtons {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  
+  .navBtn {
+    background: white;
+    color: #2148C0;
+    font-weight: 600;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .navBtn:hover {
+    background: #e5e5e5;
+  }
+  
+  /* ===== TABELA ===== */
+  .tableContainer {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    color: white;
+  }
+  
+  .table th, .table td {
+    border: 1px solid white;
+    padding: 12px;
+  }
+  
+  .table th {
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+  }
+  
+  .acoes {
+    text-align: center;
+  }
+  
+  .btnIcon {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 5px;
+    color: white;
+    transition: 0.2s;
+  }
+  
+  .btnIcon:hover {
+    transform: scale(1.2);
+  }
+  
