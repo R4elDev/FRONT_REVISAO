@@ -1,3 +1,139 @@
+// ===== CONFIGURAÇÃO DA API =====
+const API_BASE_URL = 'http://localhost:8080';
+
+// Headers padrão para requisições
+const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+};
+
+// ===== FUNÇÕES DE API =====
+
+// LOGIN
+const login = async (username, password) => {
+    try {
+        console.log('Tentando login com:', { username, password });
+        
+        const response = await fetch(`${API_BASE_URL}/v1/login`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ username, password })
+        });
+        
+        console.log('Status da resposta:', response.status);
+        
+        const result = await response.json();
+        console.log('Resposta completa:', result);
+        
+        return result;
+    } catch (error) {
+        console.error('Erro no login:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+// LIVROS
+const getLivros = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/livros`);
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar livros:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+const createLivro = async (livro) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/livro`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(livro)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao criar livro:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+const deleteLivro = async (id) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/livro/${id}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao excluir livro:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+// ESTOQUE
+const getLivrosEstoque = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/livros-estoque`);
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar livros do estoque:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+const updateEstoque = async (id, quantidade) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/estoque/${id}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({ quantidade })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao atualizar estoque:', error);
+        return { status: 500, message: 'Erro de conexão' };
+    }
+};
+
+// ===== FUNÇÕES AUXILIARES =====
+
+// Função para mostrar mensagens de sucesso/erro
+const showMessage = (message, isError = false) => {
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        z-index: 1000;
+        background-color: ${isError ? '#dc3545' : '#28a745'};
+    `;
+    
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        if (document.body.contains(messageDiv)) {
+            document.body.removeChild(messageDiv);
+        }
+    }, 3000);
+};
+
+// Função para validar campos obrigatórios
+const validateRequired = (fields) => {
+    for (const [key, value] of Object.entries(fields)) {
+        if (!value || value.trim() === '') {
+            showMessage(`Campo ${key} é obrigatório`, true);
+            return false;
+        }
+    }
+    return true;
+};
+
+// ===== COMPONENTES DA APLICAÇÃO =====
+
 const root = document.getElementById("root");
 // Tela de Login
 function createLoginScreen() {
@@ -63,9 +199,42 @@ function createLoginScreen() {
   container.appendChild(inputsContainer);
   container.appendChild(buttonContainer);
 
-  // evento do botão → troca para home
-  loginButton.addEventListener("click", () => {
-    renderScreen("home");
+  // evento do botão → integração com API
+  loginButton.addEventListener("click", async () => {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    
+    // Validação de campos obrigatórios
+    if (!validateRequired({ username, password })) {
+      return;
+    }
+    
+    // Desabilita o botão durante o login
+    loginButton.disabled = true;
+    loginButton.textContent = "CARREGANDO...";
+    
+    try {
+      const result = await login(username, password);
+      
+      // Verifica se o login foi bem-sucedido
+      if (result.status === 200 || (result.usuario && result.usuario.id)) {
+        showMessage(result.message || "Login realizado com sucesso!");
+        // Salva dados do usuário (opcional)
+        if (result.usuario) {
+          localStorage.setItem('user', JSON.stringify(result.usuario));
+        }
+        renderScreen("home");
+      } else {
+        showMessage(result.message || "Usuário ou senha incorretos", true);
+        console.error('Login falhou:', result);
+      }
+    } catch (error) {
+      showMessage("Erro de conexão com o servidor", true);
+    } finally {
+      // Reabilita o botão
+      loginButton.disabled = false;
+      loginButton.textContent = "LOGIN";
+    }
   });
 
   return container;
@@ -141,14 +310,38 @@ function createHomeScreen() {
   
     const tbody = document.createElement("tbody");
   
-    const livros = [
-      { id: 120, titulo: "A Volta ao Mundo em 80 Dias" },
-      { id: 456, titulo: "O velho e o menino" },
-      { id: 987, titulo: "As coisas que você só vê quando desacelera" },
-      { id: 321, titulo: "O Homem que Calculava" },
-    ];
-  
-    livros.forEach((livro) => {
+    // Função para carregar livros da API
+    const loadLivros = async () => {
+      try {
+        const result = await getLivros();
+        
+        if (result.status === 200 && result.livros) {
+          tbody.innerHTML = ''; // Limpa a tabela
+          
+          if (result.livros.length === 0) {
+            const emptyRow = document.createElement("tr");
+            const emptyCell = document.createElement("td");
+            emptyCell.colSpan = 3;
+            emptyCell.textContent = "Nenhum livro encontrado";
+            emptyCell.style.textAlign = "center";
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+            return;
+          }
+          
+          result.livros.forEach((livro) => {
+            createLivroRow(livro);
+          });
+        } else {
+          showMessage(result.message || "Erro ao carregar livros", true);
+        }
+      } catch (error) {
+        showMessage("Erro de conexão ao carregar livros", true);
+      }
+    };
+    
+    // Função para criar linha da tabela
+    const createLivroRow = (livro) => {
       const row = document.createElement("tr");
   
       const tdId = document.createElement("td");
@@ -171,7 +364,10 @@ function createHomeScreen() {
       imgEdit.style.height = "20px";
       btnEdit.appendChild(imgEdit);
 
-      btnEdit.addEventListener("click", () => alert(`Editar ${livro.titulo}`));
+      btnEdit.addEventListener("click", () => {
+        // TODO: Implementar edição
+        alert(`Editar ${livro.titulo}`);
+      });
 
       const btnDelete = document.createElement("button");
       btnDelete.classList.add("btnIcon", "delete");
@@ -184,7 +380,22 @@ function createHomeScreen() {
       imgDelete.style.height = "20px";
       btnDelete.appendChild(imgDelete);
 
-      btnDelete.addEventListener("click", () => alert(`Excluir ${livro.titulo}`));
+      btnDelete.addEventListener("click", async () => {
+        if (confirm(`Deseja realmente excluir o livro "${livro.titulo}"?`)) {
+          try {
+            const result = await deleteLivro(livro.id);
+            
+            if (result.status === 200) {
+              showMessage("Livro excluído com sucesso!");
+              loadLivros(); // Recarrega a lista
+            } else {
+              showMessage(result.message || "Erro ao excluir livro", true);
+            }
+          } catch (error) {
+            showMessage("Erro de conexão ao excluir livro", true);
+          }
+        }
+      });
 
       tdAction.appendChild(btnEdit);
       tdAction.appendChild(btnDelete);
@@ -194,7 +405,10 @@ function createHomeScreen() {
       row.appendChild(tdTitle);
       row.appendChild(tdAction);
       tbody.appendChild(row);
-    });
+    };
+    
+    // Carrega os livros ao criar a tela
+    loadLivros();
   
     table.appendChild(thead);
     table.appendChild(tbody);
@@ -211,100 +425,7 @@ function createHomeScreen() {
 
 // Add these new functions after createHomeScreen()
 
-function createNovoLivroScreen() {
-    const container = document.createElement("div");
-    container.classList.add("homeContainer");
-  
-    // Header (reusing the same header from home)
-    const header = document.createElement("header");
-    header.classList.add("headerWhite");
-  
-    const logoGroup = document.createElement("div");
-    logoGroup.classList.add("logoGroup");
-  
-    const logoImg = document.createElement("img");
-    logoImg.src = "./img/lion-book 1.png";
-    logoImg.alt = "LionBook Logo";
-  
-    const logoText = document.createElement("h1");
-    logoText.textContent = "LionBook";
-    logoText.classList.add("logoTitle");
-  
-    logoGroup.appendChild(logoImg);
-    logoGroup.appendChild(logoText);
-    header.appendChild(logoGroup);
-  
-    // Main content
-    const main = document.createElement("main");
-    main.classList.add("mainSection");
-  
-    const formContainer = document.createElement("div");
-    formContainer.classList.add("formContainer");
-  
-    const form = document.createElement("form");
-    form.classList.add("bookForm");
-  
-    // Input fields
-    const fields = [
-      { label: "ID", type: "number", name: "id" },
-      { label: "Título", type: "text", name: "titulo" },
-      { label: "Autor", type: "text", name: "autor" },
-      { label: "Quantidade", type: "number", name: "quantidade" }
-    ];
-  
-    fields.forEach(field => {
-      const inputGroup = document.createElement("div");
-      inputGroup.classList.add("inputGroup");
-  
-      const label = document.createElement("label");
-      label.textContent = field.label;
-      label.htmlFor = field.name;
-  
-      const input = document.createElement("input");
-      input.type = field.type;
-      input.id = field.name;
-      input.name = field.name;
-      input.classList.add("formInput");
-  
-      inputGroup.appendChild(label);
-      inputGroup.appendChild(input);
-      form.appendChild(inputGroup);
-    });
-  
-    // Buttons
-    const buttonGroup = document.createElement("div");
-    buttonGroup.classList.add("buttonGroup");
-  
-    const saveBtn = document.createElement("button");
-    saveBtn.textContent = "SALVAR";
-    saveBtn.classList.add("primaryBtn");
-    saveBtn.type = "button";
-    saveBtn.addEventListener("click", () => {
-      alert("Salvando livro...");
-      // Aqui você implementará a lógica de salvamento com a API
-    });
-  
-    const cancelBtn = document.createElement("button");
-    cancelBtn.textContent = "CANCELAR";
-    cancelBtn.classList.add("secondaryBtn");
-    cancelBtn.type = "button";
-    cancelBtn.addEventListener("click", () => {
-      renderScreen("home");
-    });
-  
-    buttonGroup.appendChild(saveBtn);
-    buttonGroup.appendChild(cancelBtn);
-    form.appendChild(buttonGroup);
-  
-    formContainer.appendChild(form);
-    main.appendChild(formContainer);
-    container.appendChild(header);
-    container.appendChild(main);
-  
-    return container;
-}
-  
-  
+
 function createNovoLivroScreen() {
     const container = document.createElement("div");
     container.classList.add("homeContainer");
@@ -335,22 +456,69 @@ function createNovoLivroScreen() {
     const form = document.createElement("form");
     form.classList.add("cadastroForm");
   
-    // Input fields
-    const fields = [
-      { label: "TÍTULO", type: "text", name: "titulo" },
-      { label: "QUANTIDADE", type: "number", name: "quantidade" },
-      { label: "ISBN", type: "text", name: "isbn" },
-      { label: "DATA DE PUBLICAÇÃO", type: "date", name: "dataPublicacao" }
-    ];
-  
-    fields.forEach(field => {
-      const input = document.createElement("input");
-      input.type = field.type;
-      input.placeholder = field.label;
-      input.name = field.name;
-      input.classList.add("cadastroInput");
-      form.appendChild(input);
-    });
+    // Input TÍTULO
+    const inputTitulo = document.createElement("input");
+    inputTitulo.type = "text";
+    inputTitulo.placeholder = "TÍTULO";
+    inputTitulo.name = "titulo";
+    inputTitulo.classList.add("cadastroInput");
+    form.appendChild(inputTitulo);
+    
+    // Dropdown CATEGORIA
+    const selectCategoria = document.createElement("select");
+    selectCategoria.name = "categoria";
+    selectCategoria.classList.add("cadastroInput", "selectInput");
+    const optionCategoria = document.createElement("option");
+    optionCategoria.value = "";
+    optionCategoria.textContent = "CATEGORIA";
+    optionCategoria.disabled = true;
+    optionCategoria.selected = true;
+    selectCategoria.appendChild(optionCategoria);
+    form.appendChild(selectCategoria);
+    
+    // Carrega categorias no dropdown
+    const loadCategorias = async () => {
+      try {
+        const result = await getCategorias();
+        
+        if (result.status === 200 && result.categorias) {
+          result.categorias.forEach(categoria => {
+            const option = document.createElement("option");
+            option.value = categoria.id;
+            option.textContent = categoria.nome;
+            selectCategoria.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      }
+    };
+    
+    loadCategorias();
+    
+    // Input QUANTIDADE
+    const inputQuantidade = document.createElement("input");
+    inputQuantidade.type = "number";
+    inputQuantidade.placeholder = "QUANTIDADE";
+    inputQuantidade.name = "quantidade";
+    inputQuantidade.classList.add("cadastroInput");
+    form.appendChild(inputQuantidade);
+    
+    // Input ISBN
+    const inputIsbn = document.createElement("input");
+    inputIsbn.type = "text";
+    inputIsbn.placeholder = "ISBN";
+    inputIsbn.name = "isbn";
+    inputIsbn.classList.add("cadastroInput");
+    form.appendChild(inputIsbn);
+    
+    // Input ANO DE PUBLICAÇÃO
+    const inputAnoPublicacao = document.createElement("input");
+    inputAnoPublicacao.type = "number";
+    inputAnoPublicacao.placeholder = "ANO DE PUBLICAÇÃO";
+    inputAnoPublicacao.name = "ano_publicacao";
+    inputAnoPublicacao.classList.add("cadastroInput");
+    form.appendChild(inputAnoPublicacao);
   
     // Buttons
     const buttonGroup = document.createElement("div");
@@ -367,9 +535,51 @@ function createNovoLivroScreen() {
     cancelarBtn.type = "button";
     
     // Event listeners
-    cadastrarBtn.addEventListener("click", () => {
-      alert("Cadastrando livro...");
-      // Implementar lógica de cadastro com API
+    cadastrarBtn.addEventListener("click", async () => {
+      const titulo = inputTitulo.value;
+      const categoria_id = selectCategoria.value;
+      const quantidade = inputQuantidade.value;
+      const isbn = inputIsbn.value;
+      const ano_publicacao = inputAnoPublicacao.value;
+      
+      // Validação - apenas título é obrigatório
+      if (!validateRequired({ titulo })) {
+        return;
+      }
+      
+      // Desabilita o botão durante o cadastro
+      cadastrarBtn.disabled = true;
+      cadastrarBtn.textContent = "CADASTRANDO...";
+      
+      try {
+        const livroData = {
+          titulo,
+          ...(categoria_id && { categoria_id: parseInt(categoria_id) }),
+          ...(quantidade && { quantidade: parseInt(quantidade) }),
+          ...(isbn && { isbn }),
+          ...(ano_publicacao && { ano_publicacao: parseInt(ano_publicacao) })
+        };
+        
+        const result = await createLivro(livroData);
+        
+        if (result.status === 200 || result.status === 201) {
+          showMessage("Livro cadastrado com sucesso!");
+          // Limpa o formulário
+          inputTitulo.value = '';
+          selectCategoria.selectedIndex = 0;
+          inputQuantidade.value = '';
+          inputIsbn.value = '';
+          inputAnoPublicacao.value = '';
+        } else {
+          showMessage(result.message || "Erro ao cadastrar livro", true);
+        }
+      } catch (error) {
+        showMessage("Erro de conexão ao cadastrar livro", true);
+      } finally {
+        // Reabilita o botão
+        cadastrarBtn.disabled = false;
+        cadastrarBtn.textContent = "CADASTRAR";
+      }
     });
     
     cancelarBtn.addEventListener("click", () => {
